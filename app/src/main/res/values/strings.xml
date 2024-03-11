@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NotepadAlarm</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="note">Note</string>
+    <string name="select_time">Select Time</string>
+    <string name="select_date">Select Date</string>
+    <string name="select">Select</string>
+    <string name="audio">Audio</string>
+    <string name="play_pause_toggle_description">Play/Pause Toggle</string>
+    <string name="vibrate">Vibrate</string>
+
+
+    <string-array name="ringtoneItem">
+        <item>Item 1</item>
+        <item>Item 2</item>
+        <item>Item 3</item>
+    </string-array>
+</resources>
