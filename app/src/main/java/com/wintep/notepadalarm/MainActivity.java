@@ -3,7 +3,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.UiModeManager;
 import android.content.Context;
@@ -24,12 +23,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity{
     private FloatingActionButton addAlarmButton;
     final String[] ringtone = {"Alarm 1", "Alarm 2", "Alarm 3", "Islamic", "Blink"};
     private MediaPlayer mediaPlayer;
+    private int alarmResourceId = R.raw.alarm_1;
     private RecyclerView alarmRecyclerView;
     private AlarmAdapter alarmAdapter;
 
@@ -74,6 +78,8 @@ public class MainActivity extends AppCompatActivity{
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
 
+        AtomicReference<Date> alarmDate = null;
+        AtomicReference<Date> alarmTime = null;
         final TextView cancelButton = dialog.findViewById(R.id.cancel_button);
         final TextView saveButton = dialog.findViewById(R.id.save_button);
         final EditText alarmNote = dialog.findViewById(R.id.alarm_note);
@@ -98,18 +104,23 @@ public class MainActivity extends AppCompatActivity{
             switch (item){
                 case "Alarm 1":
                     mediaPlayer = MediaPlayer.create(this,R.raw.alarm_1);
+                    alarmResourceId = R.raw.alarm_1;
                     break;
                 case "Alarm 2":
                     mediaPlayer = MediaPlayer.create(this,R.raw.alarm_2);
+                    alarmResourceId = R.raw.alarm_2;
                     break;
                 case "Alarm 3":
                     mediaPlayer = MediaPlayer.create(this,R.raw.alarm_3);
+                    alarmResourceId = R.raw.alarm_3;
                     break;
                 case "Islamic":
                     mediaPlayer = MediaPlayer.create(this,R.raw.islamic);
+                    alarmResourceId = R.raw.islamic;
                     break;
                 case "Blink":
                     mediaPlayer = MediaPlayer.create(this,R.raw.blink);
+                    alarmResourceId = R.raw.blink;
                     break;
             }
         });
@@ -139,6 +150,7 @@ public class MainActivity extends AppCompatActivity{
         ///Date Picker
         dateTextView.setOnClickListener(v -> {
             PickerHelper.showDatePickerDialog(this, date -> {
+                alarmDate.set(date);
                 SimpleDateFormat dateFormat;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
@@ -150,11 +162,34 @@ public class MainActivity extends AppCompatActivity{
 
         ///Time Picker
         timeTextView.setOnClickListener(v -> PickerHelper.showTimePickerDialog(MainActivity.this, time -> {
+            alarmTime.set(time);
             SimpleDateFormat sdf;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 sdf = new SimpleDateFormat("hh:mm aa");
                 timeTextView.setText(sdf.format(time));
             }
         }));
+
+        saveButton.setOnClickListener(v -> {
+            if(alarmTime.get()==null){
+                Toast.makeText(this, "Select Time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(alarmDate.get() == null){
+                alarmDate.set(new Date(System.currentTimeMillis()));
+            }
+
+            final AlarmHelper alarmHelper = new AlarmHelper(MainActivity.this);
+            final Calendar alarmCalendar = Calendar.getInstance();
+
+            alarmCalendar.set(Calendar.YEAR, alarmDate.get().getYear());
+            alarmCalendar.set(Calendar.MONTH, alarmDate.get().getMonth());
+            alarmCalendar.set(Calendar.DAY_OF_MONTH, alarmDate.get().getDay());
+            alarmCalendar.set(Calendar.HOUR_OF_DAY, alarmDate.get().getHours());
+            alarmCalendar.set(Calendar.MINUTE, alarmTime.get().getMinutes());
+            alarmCalendar.set(Calendar.SECOND, 0);
+
+            alarmHelper.setAlarm(alarmCalendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked());
+        });
     }
 }
