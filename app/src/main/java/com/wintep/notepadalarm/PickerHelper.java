@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -51,4 +53,28 @@ public class PickerHelper {
                 }, hour, minute, false);
         timePickerDialog.show();
     }
+
+    // Merge alarmTime with current Date
+    public static Date mergeWithCurrentDate(Date alarmTime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(alarmTime);
+        Calendar currentCalendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, currentCalendar.get(Calendar.YEAR));
+        calendar.set(Calendar.MONTH, currentCalendar.get(Calendar.MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH, currentCalendar.get(Calendar.DAY_OF_MONTH));
+        return calendar.getTime();
+    }
+
+    // Merge alarmTime with alarmDate
+    public static Date mergeDates(Date alarmDate, Date alarmTime) {
+        Calendar dateCalendar = Calendar.getInstance();
+        dateCalendar.setTime(alarmDate);
+        Calendar timeCalendar = Calendar.getInstance();
+        timeCalendar.setTime(alarmTime);
+        dateCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+        dateCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+        dateCalendar.set(Calendar.SECOND, timeCalendar.get(Calendar.SECOND));
+        return dateCalendar.getTime();
+    }
+
 }

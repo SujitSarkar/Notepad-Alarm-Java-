@@ -12,17 +12,18 @@ import android.icu.text.SimpleDateFormat;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -78,15 +79,16 @@ public class MainActivity extends AppCompatActivity{
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
 
-        AtomicReference<Date> alarmDate = null;
-        AtomicReference<Date> alarmTime = null;
+        AtomicReference<Date> alarmDate = new AtomicReference<>(null);
+        AtomicReference<Date> alarmTime = new AtomicReference<>(null);
+
         final TextView cancelButton = dialog.findViewById(R.id.cancel_button);
         final TextView saveButton = dialog.findViewById(R.id.save_button);
         final EditText alarmNote = dialog.findViewById(R.id.alarm_note);
         final TextView dateTextView = dialog.findViewById(R.id.date_text_view);
         final TextView timeTextView = dialog.findViewById(R.id.time_text_view);
         final ToggleButton playPauseToggleButton = dialog.findViewById(R.id.playPauseToggleButton);
-        final Switch vibrateSwitch = dialog.findViewById(R.id.vibrate_switch);
+        final SwitchMaterial vibrateSwitch = dialog.findViewById(R.id.vibrate_switch);
         cancelButton.setOnClickListener(v -> dialog.dismiss());
 
         //Dropdown variables
@@ -150,11 +152,11 @@ public class MainActivity extends AppCompatActivity{
         ///Date Picker
         dateTextView.setOnClickListener(v -> {
             PickerHelper.showDatePickerDialog(this, date -> {
-                alarmDate.set(date);
                 SimpleDateFormat dateFormat;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
                     dateTextView.setText(dateFormat.format(date));
+                    alarmDate.set(date);
                 }
 
             });
@@ -162,34 +164,48 @@ public class MainActivity extends AppCompatActivity{
 
         ///Time Picker
         timeTextView.setOnClickListener(v -> PickerHelper.showTimePickerDialog(MainActivity.this, time -> {
-            alarmTime.set(time);
             SimpleDateFormat sdf;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 sdf = new SimpleDateFormat("hh:mm aa");
                 timeTextView.setText(sdf.format(time));
+                alarmTime.set(time);
             }
         }));
 
         saveButton.setOnClickListener(v -> {
-            if(alarmTime.get()==null){
+            if(alarmTime.get()!=null){
+
+                if (alarmDate.get() == null) {
+                    alarmTime.set(PickerHelper.mergeWithCurrentDate(alarmTime.get()));
+                } else {
+                    alarmTime.set(PickerHelper.mergeDates(alarmDate.get(), alarmTime.get()));
+                }
+                final Calendar calendar = Calendar.getInstance();
+                calendar.setTime(alarmTime.get());
+
+                final AlarmHelper alarmHelper = new AlarmHelper(MainActivity.this);
+
+                Log.d("Year", String.valueOf(calendar.get(Calendar.YEAR)));
+                Log.d("Month",String.valueOf(calendar.get(Calendar.MONTH) + 1));
+                Log.d("Day",String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+                Log.d("Hour",String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
+                Log.d("Minute",String.valueOf(calendar.get(Calendar.MINUTE)));
+                Log.d("Note",String.valueOf(alarmNote.getText()));
+                Log.d("alarm Ringtone",String.valueOf(alarmResourceId));
+                Log.d("Vibrate",String.valueOf(vibrateSwitch.isChecked()));
+                Log.d("originalTime",String.valueOf(calendar.getTimeInMillis()));
+
+                if(alarmDate.get()!=null){
+                    alarmHelper.setAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"event");
+                    Toast.makeText(this, "Event set", Toast.LENGTH_LONG).show();
+                }else{
+                    alarmHelper.setAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"alarm");
+                    Toast.makeText(this, "Alarm set", Toast.LENGTH_LONG).show();
+                }
+                dialog.dismiss();
+            }else{
                 Toast.makeText(this, "Select Time", Toast.LENGTH_SHORT).show();
-                return;
             }
-            if(alarmDate.get() == null){
-                alarmDate.set(new Date(System.currentTimeMillis()));
-            }
-
-            final AlarmHelper alarmHelper = new AlarmHelper(MainActivity.this);
-            final Calendar alarmCalendar = Calendar.getInstance();
-
-            alarmCalendar.set(Calendar.YEAR, alarmDate.get().getYear());
-            alarmCalendar.set(Calendar.MONTH, alarmDate.get().getMonth());
-            alarmCalendar.set(Calendar.DAY_OF_MONTH, alarmDate.get().getDay());
-            alarmCalendar.set(Calendar.HOUR_OF_DAY, alarmDate.get().getHours());
-            alarmCalendar.set(Calendar.MINUTE, alarmTime.get().getMinutes());
-            alarmCalendar.set(Calendar.SECOND, 0);
-
-            alarmHelper.setAlarm(alarmCalendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked());
         });
     }
 }

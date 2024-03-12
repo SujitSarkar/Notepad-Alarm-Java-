@@ -145,7 +145,7 @@
     </LinearLayout>
 
     <!--Vibrate Switch-->
-    <Switch
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/vibrate_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -157,7 +157,9 @@
         android:textColor="@android:color/black"
         android:textSize="16sp"
         android:thumbTint="@color/primary"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        tools:ignore="UseSwitchCompatOrMaterialXml">
+
+    </com.google.android.material.switchmaterial.SwitchMaterial>
 
     <View
         android:layout_width="match_parent"
