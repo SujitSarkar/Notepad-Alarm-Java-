@@ -10,9 +10,11 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -20,18 +22,24 @@ import java.util.Date;
 import java.util.Locale;
 
 public class AlarmActivity extends AppCompatActivity {
-
     String alarmNote;
     String eventOrAlarm;
     int alarmResourceId;
     boolean isVibrate;
-    Long originalTime;
-    Long savingTime;
+    long originalTime;
+    long savingTime;
+    TextView alarmTimeTextView, alarmNoteTextView;
+    Button snoozeButton, stopButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
+
+        alarmTimeTextView = findViewById(R.id.alarmTime);
+        alarmNoteTextView = findViewById(R.id.alarmNote);
+        snoozeButton = findViewById(R.id.snoozeButton);
+        stopButton = findViewById(R.id.stopButton);
 
         // Get the Intent that started this activity
         Intent intent = getIntent();
@@ -43,38 +51,27 @@ public class AlarmActivity extends AppCompatActivity {
             originalTime = intent.getLongExtra("originalTime",System.currentTimeMillis());
             savingTime = intent.getLongExtra("savingTime",System.currentTimeMillis());
 
+            alarmTimeTextView.setText(getFormattedTime());
+            alarmNoteTextView.setText(alarmNote);
+
             Date date = new Date(originalTime);
             final Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
-
-
             Log.d("originalTime Year", String.valueOf(calendar.get(Calendar.YEAR)));
             Log.d("originalTime Month",String.valueOf(calendar.get(Calendar.MONTH) + 1));
             Log.d("originalTime Day",String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
             Log.d("originalTime Hour",String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
             Log.d("originalTime Minute",String.valueOf(calendar.get(Calendar.MINUTE)));
-
             Log.d("alarmNote",String.valueOf(alarmNote));
             Log.d("eventOrAlarm",String.valueOf(eventOrAlarm));
             Log.d("alarmResourceId",String.valueOf(alarmResourceId));
             Log.d("vibrate",String.valueOf(isVibrate));
 
-
             playRingtone();
-            wakeupScreen();
-            showDialog();
-        }
-    }
 
-    void wakeupScreen(){
-        // Acquire the power lock
-        PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "MyApp:AlarmWakeLock");
-        wakeLock.acquire(10*60*1000L /*10 minutes*/);
-        // Release the wake lock after handling the alarm
-//        if (wakeLock.isHeld()) {
-//            wakeLock.release();
-//        }
+            snoozeButton.setOnClickListener(view -> snoozeAlarm());
+            stopButton.setOnClickListener(view -> stopAlarm());
+        }
     }
 
     void playRingtone(){
@@ -103,22 +100,7 @@ public class AlarmActivity extends AppCompatActivity {
         }
     }
 
-
-    private void showDialog() {
-        // Create and configure the custom dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(eventOrAlarm.equals("alarm") ? "Alarm" : alarmNote);
-        builder.setMessage(getFormattedTime(eventOrAlarm,originalTime));
-        builder.setPositiveButton("Snooze", (dialog, which) -> snoozeAlarm(this));
-        builder.setNegativeButton("Stop", (dialog, which) -> stopAlarm(this, eventOrAlarm));
-        builder.setCancelable(false); // Prevent the dialog from being dismissed outside of button clicks
-
-        // Show the dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private String getFormattedTime(String eventOrAlarm, long originalTime) {
+    private String getFormattedTime() {
         if (eventOrAlarm.equals("alarm")) {
             SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa", Locale.getDefault());
             return timeFormat.format(new Date(originalTime));
@@ -128,19 +110,13 @@ public class AlarmActivity extends AppCompatActivity {
         }
     }
 
-    private void snoozeAlarm(Context context) {
-        // Snooze the alarm for 5 minutes
-        // Your snooze logic for alarm here
-    }
+    private void snoozeAlarm() {}
 
-    private void stopAlarm(Context context, String eventOrAlarm) {
-        // Implement stop logic based on event type
+    private void stopAlarm() {
         if (eventOrAlarm.equals("alarm")) {
-            // Stop the alarm and dismiss the dialog
-            // Your stop logic for alarm here
+
         } else {
-            // Stop the alarm for 1 year from the original date
-            // Your stop logic for event here
+
         }
     }
 }

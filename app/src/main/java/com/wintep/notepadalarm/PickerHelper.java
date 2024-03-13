@@ -62,6 +62,10 @@ public class PickerHelper {
         calendar.set(Calendar.YEAR, currentCalendar.get(Calendar.YEAR));
         calendar.set(Calendar.MONTH, currentCalendar.get(Calendar.MONTH));
         calendar.set(Calendar.DAY_OF_MONTH, currentCalendar.get(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, currentCalendar.get(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, currentCalendar.get(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
 
@@ -73,7 +77,8 @@ public class PickerHelper {
         timeCalendar.setTime(alarmTime);
         dateCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
         dateCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-        dateCalendar.set(Calendar.SECOND, timeCalendar.get(Calendar.SECOND));
+        dateCalendar.set(Calendar.SECOND, 0);
+        dateCalendar.set(Calendar.MILLISECOND, 0);
         return dateCalendar.getTime();
     }
 

@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity{
-    private FloatingActionButton addAlarmButton;
     final String[] ringtone = {"Alarm 1", "Alarm 2", "Alarm 3", "Islamic", "Blink"};
     private MediaPlayer mediaPlayer;
     private int alarmResourceId = R.raw.alarm_1;
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         alarmRecyclerView = findViewById(R.id.alarm_recycler_view);
-        addAlarmButton = findViewById(R.id.add_alarm_button);
+        FloatingActionButton addAlarmButton = findViewById(R.id.add_alarm_button);
 
         alarmAdapter = new AlarmAdapter();
         alarmRecyclerView.setAdapter(alarmAdapter);

@@ -12,17 +12,20 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Alarm received");
+        // Acquire a partial wake lock to ensure the device stays awake
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK, "AlarmReceiver:WakeLock");
+        wakeLock.acquire(5 * 60 * 1000L); // Acquire the wake lock for 2 minutes
+
+        // Release the wake lock after handling the alarm
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
 
         ///Trigger Alarm activity
         Intent alarmIntent = new Intent(context, AlarmActivity.class);
-
-        alarmIntent.putExtra("alarmNote", intent.getStringExtra("alarmNote"));
-        alarmIntent.putExtra("alarmResourceId", intent.getIntExtra("alarmResourceId",0));
-        alarmIntent.putExtra("vibrate", intent.getBooleanExtra("vibrate", true));
-        alarmIntent.putExtra("eventOrAlarm", intent.getStringExtra("eventOrAlarm"));
-        alarmIntent.putExtra("savingTime", intent.getLongExtra("savingTime",System.currentTimeMillis()));
-        alarmIntent.putExtra("originalTime", intent.getLongExtra("originalTime",System.currentTimeMillis()));
-
+        alarmIntent.putExtras(intent.getExtras());
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(alarmIntent);
     }

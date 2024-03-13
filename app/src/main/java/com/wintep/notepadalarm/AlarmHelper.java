@@ -16,13 +16,14 @@ public class AlarmHelper {
 
     public void setAlarm(Calendar calendar, String alarmNote, int alarmResourceId, boolean isVibrate, String eventOrAlarm) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        final Long originalTime = calendar.getTimeInMillis();
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         alarmIntent.putExtra("alarmNote", alarmNote);
         alarmIntent.putExtra("alarmResourceId", alarmResourceId);
         alarmIntent.putExtra("vibrate", isVibrate);
         alarmIntent.putExtra("eventOrAlarm", eventOrAlarm);
         alarmIntent.putExtra("savingTime", System.currentTimeMillis());
-        alarmIntent.putExtra("originalTime", calendar.getTimeInMillis());
+        alarmIntent.putExtra("originalTime", originalTime);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
@@ -41,8 +42,6 @@ public class AlarmHelper {
         // Set repeating alarm for every day at the specified time
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     } */
-
-
 
 }
 

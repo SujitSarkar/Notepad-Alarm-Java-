@@ -20,15 +20,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NotepadAlarm"
         tools:targetApi="31">
-
         <activity
             android:name=".AlarmActivity"
-            android:exported="false"/>
-        <!-- Receiver Declaration -->
+            android:exported="false" /> <!-- Receiver Declaration -->
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.WAKE_LOCK">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.wintep.notepadalarm.ALARM" />
@@ -40,6 +39,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
