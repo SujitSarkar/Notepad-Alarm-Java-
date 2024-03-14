@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,8 +61,14 @@ public class MainActivity extends AppCompatActivity{
         alarmAdapter = new AlarmAdapter();
         alarmRecyclerView.setAdapter(alarmAdapter);
         alarmRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        getAlarmList();
 
         addAlarmButton.setOnClickListener(v -> showAddAlarmDialog());
+    }
+
+    void getAlarmList(){
+        final AlarmHelper alarmHelper = new AlarmHelper(MainActivity.this);
+        alarmAdapter.setData(alarmHelper.getWorkList());
     }
 
     void showAddAlarmDialog(){
@@ -184,23 +189,14 @@ public class MainActivity extends AppCompatActivity{
 
                 final AlarmHelper alarmHelper = new AlarmHelper(MainActivity.this);
 
-                Log.d("Year", String.valueOf(calendar.get(Calendar.YEAR)));
-                Log.d("Month",String.valueOf(calendar.get(Calendar.MONTH) + 1));
-                Log.d("Day",String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
-                Log.d("Hour",String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
-                Log.d("Minute",String.valueOf(calendar.get(Calendar.MINUTE)));
-                Log.d("Note",String.valueOf(alarmNote.getText()));
-                Log.d("alarm Ringtone",String.valueOf(alarmResourceId));
-                Log.d("Vibrate",String.valueOf(vibrateSwitch.isChecked()));
-                Log.d("originalTime",String.valueOf(calendar.getTimeInMillis()));
-
                 if(alarmDate.get()!=null){
-                    alarmHelper.setAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"event");
+                    alarmHelper.setPeriodicAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"event");
                     Toast.makeText(this, "Event set", Toast.LENGTH_LONG).show();
                 }else{
-                    alarmHelper.setAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"alarm");
+                    alarmHelper.setPeriodicAlarm(calendar, String.valueOf(alarmNote.getText()), alarmResourceId, vibrateSwitch.isChecked(),"alarm");
                     Toast.makeText(this, "Alarm set", Toast.LENGTH_LONG).show();
                 }
+                getAlarmList();
                 dialog.dismiss();
             }else{
                 Toast.makeText(this, "Select Time", Toast.LENGTH_SHORT).show();

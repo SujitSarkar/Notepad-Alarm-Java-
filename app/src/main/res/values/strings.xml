@@ -9,7 +9,7 @@
     <string name="audio">Audio</string>
     <string name="play_pause_toggle_description">Play/Pause Toggle</string>
     <string name="vibrate">Vibrate</string>
-
+    <string name="job_scheduler_id">my_app_alarm_worker_service</string>
 
     <string-array name="ringtoneItem">
         <item>Item 1</item>
